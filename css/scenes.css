@@ -1,0 +1,184 @@
+/* scenes.css —— 场景主题系统
+ * 每个场景是一套 CSS 变量 + 一层纹理。切换 = 换 <html data-scene>，整屏调子过渡 0.8s。
+ * 所有质感都用 CSS 生成，不引用任何图片文件。
+ *
+ * 场景编号（与 data/script.json 的 scene 字段一致）：
+ *   s0 楼道   s1 客厅   s2 带子画面   s3 厨房   s4 空客厅   s5 结局客厅   s6 白屏
+ */
+
+/* ── s0 · 楼道（冷、湿、声控灯） ───────────────── */
+[data-scene="s0"] {
+  --bg: #07090b;
+  --ink: #a6b6ba;
+  --ink-dim: #4f5c5e;
+  --accent: #8fd9c9;
+  --line: rgba(166, 182, 186, 0.13);
+  --halftone: rgba(0, 0, 0, 0.45);
+  --halftone-size: 4px;
+  --vignette: 0.92;
+  --tex: linear-gradient(180deg, rgba(143, 217, 201, 0.07) 0%, transparent 28%);
+}
+
+/* ── s1 · 客厅（暖黄、过曝、格纹桌布） ─────────── */
+[data-scene="s1"] {
+  --bg: #1d160b;
+  --ink: #eedaab;
+  --ink-dim: #9c8a5e;
+  --accent: #ffd892;
+  --line: rgba(238, 218, 171, 0.2);
+  --halftone: rgba(56, 36, 8, 0.26);
+  --halftone-size: 6px;
+  --vignette: 0.62;
+  --tex:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.012) 0 7px, transparent 7px 16px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 7px, transparent 7px 16px),
+    radial-gradient(ellipse at 50% 10%, rgba(255, 216, 146, 0.22), transparent 58%),
+    radial-gradient(ellipse at 50% 100%, rgba(255, 190, 110, 0.10), transparent 55%);
+}
+
+/* ── s2 · 带子画面（CRT 套 CRT，绿字终端） ──────── */
+[data-scene="s2"] {
+  --bg: #020906;
+  --ink: #5cf59b;
+  --ink-dim: #2c7a51;
+  --accent: #9dffc6;
+  --line: rgba(92, 245, 155, 0.2);
+  --halftone: rgba(0, 0, 0, 0.5);
+  --halftone-size: 3px;
+  --vignette: 0.95;
+  --tex:
+    repeating-linear-gradient(0deg, rgba(92, 245, 155, 0.07) 0 2px, transparent 2px 4px),
+    radial-gradient(ellipse at 50% 50%, rgba(92, 245, 155, 0.12), transparent 62%);
+}
+
+[data-scene="s2"] .line,
+[data-scene="s2"] .choice {
+  text-shadow: 0 0 9px rgba(92, 245, 155, 0.35);
+}
+
+/* ── s3 · 厨房（暗红、硬光、刀） ───────────────── */
+[data-scene="s3"] {
+  --bg: #0c0605;
+  --ink: #c8a69b;
+  --ink-dim: #6b4a43;
+  --accent: #8b0f12;
+  --line: rgba(200, 166, 155, 0.15);
+  --halftone: rgba(0, 0, 0, 0.55);
+  --halftone-size: 5px;
+  --vignette: 0.96;
+  --tex:
+    linear-gradient(118deg, rgba(0, 0, 0, 0.6) 0%, transparent 46%),
+    radial-gradient(ellipse at 72% 0%, rgba(139, 15, 18, 0.22), transparent 58%);
+}
+
+/* ── s4 · 空客厅（洗过澡以后，颜色被抽走） ─────── */
+[data-scene="s4"] {
+  --bg: #131312;
+  --ink: #b2aea3;
+  --ink-dim: #6a6660;
+  --accent: #8b8a80;
+  --line: rgba(178, 174, 163, 0.12);
+  --halftone: rgba(0, 0, 0, 0.5);
+  --halftone-size: 5px;
+  --vignette: 0.88;
+  --tex: none;
+}
+
+/* s4 是唯一"静止"的场景：扫描线关掉，代表电视是黑的 */
+[data-scene="s4"] .crt::after { background: none; }
+
+/* ── s5 · 结局客厅（更黄、更旧、更密） ─────────── */
+[data-scene="s5"] {
+  --bg: #221808;
+  --ink: #f1daa2;
+  --ink-dim: #9a8454;
+  --accent: #ffe08a;
+  --line: rgba(241, 218, 162, 0.18);
+  --halftone: rgba(64, 40, 6, 0.52);
+  --halftone-size: 4px;
+  --vignette: 0.8;
+  --tex: radial-gradient(ellipse at 50% 14%, rgba(255, 224, 138, 0.24), transparent 58%);
+}
+
+/* ── s6 · 白屏（过曝，E1 的白） ─────────────────── */
+[data-scene="s6"] {
+  --bg: #e9e4d7;
+  --ink: #241f15;
+  --ink-dim: #6f6a5d;
+  --accent: #a8987a;
+  --line: rgba(36, 31, 21, 0.18);
+  --halftone: rgba(120, 110, 90, 0.18);
+  --halftone-size: 6px;
+  --vignette: 0.35;
+  --tex: none;
+}
+
+[data-scene="s6"] .crt::after { background: none; }
+
+/* ── 纹理层：全屏固定，铺在每个场景上 ───────────── */
+.tex {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: var(--tex, none);
+}
+
+/* ── 场景切换（剪切）─────────────────────────────
+ * 由引擎在节点 scene 变化时给 <html> 加 .is-wiping，0.55s 后移除。
+ * 视觉：一层雪花 + 一条亮线从上扫到下 + 中间闪一下场景名。 */
+.wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.9) 0px,
+      rgba(0, 0, 0, 0.6) 1px,
+      rgba(255, 255, 255, 0.9) 2px
+    );
+  mix-blend-mode: overlay;
+}
+
+.wipe-label {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 26;
+  pointer-events: none;
+  opacity: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.5em;
+  color: #fff;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+@keyframes wipe-run {
+  0%   { opacity: 0; transform: translateY(-100%); }
+  10%  { opacity: 0.95; }
+  55%  { opacity: 0.75; }
+  100% { opacity: 0; transform: translateY(100%); }
+}
+
+@keyframes wipe-label-run {
+  0%   { opacity: 0; }
+  22%  { opacity: 0.9; }
+  70%  { opacity: 0.75; }
+  100% { opacity: 0; }
+}
+
+html.is-wiping .wipe { animation: wipe-run 0.55s ease-out both; }
+html.is-wiping .wipe-label { animation: wipe-label-run 0.55s ease-out both; }
+
+/* 减少动态效果时，切换只做一次淡出 */
+@media (prefers-reduced-motion: reduce) {
+  html.is-wiping .wipe { animation: none; opacity: 0; }
+  html.is-wiping .wipe-label { animation: none; opacity: 0; }
+  html, body { transition: none; }
+}

@@ -1,105 +1,150 @@
-/* base.css —— 底色、字体、CRT 层、正文与按钮的基础样式
-   只做"看起来像 1997 年的一台彩电"，不含任何剧情逻辑。 */
+/* base.css —— 底色、字体、HUD、正文与选项
+ * 颜色全部走 CSS 变量，由 scenes.css 按"场景"整体替换。
+ * 这里只管骨架，不管场景。 */
 
 :root {
-  --bg: #080807;
-  --ink: #cfc7b6;          /* 正文：旧纸/荧光粉的暖灰 */
-  --ink-dim: #7d766b;
-  --ink-blood: #8b0f12;    /* 血色：不是鲜红，是干掉的红 */
-  --code: #4ee08a;         /* 时间码绿，老录像机那种偏黄的绿 */
-  --line: #23211d;
+  /* 全局固定色（不随场景变） */
+  --ink-blood: #8b0f12;    /* 干掉的红 */
+  --code: #4ee08a;         /* 时间码绿 */
   --font: "SimSun", "Songti SC", "Noto Serif CJK SC", serif;
   --font-mono: "Consolas", "Courier New", monospace;
+
+  /* 默认场景（客厅）会被 scenes.css 覆盖 */
+  --bg: #171208;
+  --ink: #e2cf9f;
+  --ink-dim: #8a7a52;
+  --accent: #ffd27a;
+  --line: rgba(226, 207, 159, 0.16);
+  --halftone: rgba(0, 0, 0, 0.32);
+  --halftone-size: 5px;
+  --grain: 0.35;
+  --vignette: 0.78;
 }
 
 * { box-sizing: border-box; }
 
 html, body {
   margin: 0;
-  height: 100%;
+  min-height: 100%;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font);
   letter-spacing: 0.04em;
   -webkit-font-smoothing: antialiased;
+  /* 场景切换：整屏颜色在 0.8s 内过渡过去，不是硬切 */
+  transition: background-color 0.8s ease, color 0.8s ease;
 }
 
-/* 全屏 CRT 容器：四角暗角 + 扫描线 */
+/* ── CRT 容器：光、暗角、场景纹理都挂在这一层 ── */
 .crt {
   position: relative;
-  min-height: 100%;
-  padding: 28px clamp(20px, 5vw, 64px);
+  min-height: 100vh;
+  padding: 26px clamp(20px, 5vw, 64px);
   background:
-    radial-gradient(ellipse at 50% 45%, rgba(255, 240, 200, 0.05), transparent 60%),
-    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.85) 100%),
+    radial-gradient(ellipse at 50% 38%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 62%),
+    radial-gradient(ellipse at 50% 50%, transparent 52%, rgba(0, 0, 0, var(--vignette)) 100%),
     var(--bg);
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
-/* 扫描线：极轻，读久了不累 */
+/* 网点纸：整屏细网点，梦核的底噪 */
+.crt::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background-image: radial-gradient(
+    circle,
+    var(--halftone) 0.8px,
+    transparent 1.2px
+  );
+  background-size: var(--halftone-size) var(--halftone-size);
+  opacity: 1;
+  mix-blend-mode: multiply;
+}
+
+/* 扫描线 */
 .crt::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
+  z-index: 3;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.035) 0px,
-    rgba(255, 255, 255, 0.035) 1px,
+    rgba(255, 255, 255, 0.045) 0px,
+    rgba(255, 255, 255, 0.045) 1px,
     transparent 1px,
     transparent 3px
   );
   mix-blend-mode: overlay;
-  z-index: 30;
 }
 
-/* 顶部 HUD：左边片名，右边时间码 */
+/* ── 顶部 HUD ── */
 .hud {
+  position: relative;
+  z-index: 6;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: 16px;
   border-bottom: 1px solid var(--line);
   padding-bottom: 10px;
-  margin-bottom: 34px;
+  margin-bottom: 30px;
 }
 
 .hud-title {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--ink-dim);
   letter-spacing: 0.3em;
 }
 
-/* 时间码：等宽、绿色、常驻右上 */
+.hud-scene {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-dim);
+  opacity: 0.7;
+  letter-spacing: 0.14em;
+}
+
+/* 时间码：等宽、常驻右上 */
 .code {
   font-family: var(--font-mono);
   font-size: 15px;
   color: var(--code);
   letter-spacing: 0.12em;
-  opacity: 0.9;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--code) 45%, transparent);
 }
 
-/* 正文区：窄栏，像看一台 4:3 的电视，不像在刷网页 */
+/* ── 正文 ── */
 .screen {
-  max-width: 640px;
+  position: relative;
+  z-index: 5;
+  max-width: 636px;
   margin: 0 auto;
-  padding-bottom: 60px;
+  padding-bottom: 90px;
 }
 
 .line {
   margin: 0 0 18px;
   font-size: 19px;
   line-height: 2;
-  text-indent: 0;
 }
 
 .line.dim { color: var(--ink-dim); }
 
-/* 选项区 */
+.line.small {
+  font-size: 15px;
+  color: var(--ink-dim);
+}
+
+/* ── 选项 ── */
 .choices {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin: 34px 0 26px;
+  margin: 32px 0 24px;
 }
 
 .choice {
@@ -109,9 +154,9 @@ html, body {
   font-size: 17px;
   line-height: 1.8;
   color: var(--ink);
-  background: transparent;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
   border: 1px solid var(--line);
-  border-left: 2px solid #3a352c;
+  border-left: 2px solid var(--accent);
   padding: 12px 16px;
   letter-spacing: 0.04em;
   cursor: pointer;
@@ -120,26 +165,27 @@ html, body {
 
 .choice:hover,
 .choice:focus-visible {
-  background: rgba(207, 199, 182, 0.06);
-  border-left-color: var(--ink-dim);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: var(--accent);
   outline: none;
 }
 
-/* 日志/调试区 */
+/* ── 调试/日志 ── */
 .log {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.8;
   color: var(--ink-dim);
   white-space: pre-wrap;
   border-left: 1px solid var(--line);
   padding: 4px 0 4px 14px;
-  margin: 0 0 30px;
+  margin: 0 0 28px;
 }
 
 .footer-note {
-  font-size: 13px;
-  color: #514b42;
+  font-size: 12px;
+  color: var(--ink-dim);
+  opacity: 0.55;
   border-top: 1px solid var(--line);
   padding-top: 14px;
 }

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-scene="s1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>请勿倒带 · 场景主题预览</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/scenes.css">
+<link rel="stylesheet" href="css/effects.css">
+<style>
+  /* 仅预览页用：底部场景切换条 */
+  .bar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 40;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(8, 8, 7, 0.92);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .bar button {
+    appearance: none;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: #cfc7b6;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 6px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .bar button.active {
+    background: rgba(255, 210, 122, 0.18);
+    border-color: rgba(255, 210, 122, 0.5);
+    color: #fff;
+  }
+  .bar .spacer { flex: 1; }
+  .bar .hint {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: #6e675c;
+    align-self: center;
+  }
+  .screen { padding-bottom: 120px; }
+</style>
+</head>
+<body>
+<div class="tex"></div>
+<div class="wipe"></div>
+<div class="wipe-label" id="wipeLabel">客厅</div>
+
+<div class="crt">
+  <header class="hud">
+    <span class="hud-title">请勿倒带</span>
+    <span class="hud-scene" id="sceneName">场景 01 / 客厅</span>
+    <span class="code" id="timecode">00:00:00</span>
+  </header>
+
+  <main class="screen">
+    <p class="line" id="line1">客厅里只有我、一只猫、一条狗，和一台雪花电视。</p>
+    <p class="line dim" id="line2">转页风扇在转。墙上的挂历停在七月。</p>
+
+    <div class="choices">
+      <button class="choice">放进录像机</button>
+      <button class="choice">喊一声阿磊</button>
+      <button class="choice">不动它</button>
+    </div>
+
+    <p class="line small" id="note">这一页是场景预览：点下面的按钮，整屏会跟着换调子。</p>
+  </main>
+</div>
+
+<div class="bar" id="bar">
+  <button data-scene="s0">00 楼道</button>
+  <button data-scene="s1" class="active">01 客厅</button>
+  <button data-scene="s2">02 带子</button>
+  <button data-scene="s3">03 厨房</button>
+  <button data-scene="s4">04 空客厅</button>
+  <button data-scene="s5">05 结局</button>
+  <button data-scene="s6">06 白屏</button>
+  <span class="spacer"></span>
+  <span class="hint">切换 = 雪花擦除 0.55s</span>
+</div>
+
+<script>
+const SCENES = {
+  s0: { no: "00", name: "楼道",   l1: "下楼的时候，声控灯一直没亮。", l2: "楼道里只有我的脚步声，还有门后面很轻的电视声。" },
+  s1: { no: "01", name: "客厅",   l1: "客厅里只有我、一只猫、一条狗，和一台雪花电视。", l2: "转页风扇在转。墙上的挂历停在七月。" },
+  s2: { no: "02", name: "带子画面", l1: "00:07:20 —— 画面里，阿磊在剁肉。", l2: "狗在旁边吃骨头。猫在旁边吃肠子。" },
+  s3: { no: "03", name: "厨房",   l1: "砧板是干的。刀架上少了一把刀。", l2: "冰箱在响。我听见身后有人把拖鞋踩得很慢。" },
+  s4: { no: "04", name: "空客厅", l1: "客厅很安静。电视是黑的。", l2: "茶几上三罐啤酒，一罐开了，没喝。" },
+  s5: { no: "05", name: "结局客厅", l1: "这盘带子没有标签。", l2: "画面里，有人推开门进来，换鞋，坐下。" },
+  s6: { no: "06", name: "白屏",   l1: "……", l2: "刀落下来之前，屏幕先白了。" }
+};
+
+const label = document.getElementById('wipeLabel');
+const sceneName = document.getElementById('sceneName');
+const line1 = document.getElementById('line1');
+const line2 = document.getElementById('line2');
+const bar = document.getElementById('bar');
+let busy = false;
+
+function setScene(id) {
+  const s = SCENES[id];
+  if (!s || busy) return;
+  busy = true;
+
+  label.textContent = s.name;
+  document.documentElement.classList.add('is-wiping');
+
+  // 擦除动画跑到一半再换调子，切换感才像"剪切"
+  setTimeout(() => {
+    document.documentElement.dataset.scene = id;
+    sceneName.textContent = '场景 ' + s.no + ' / ' + s.name;
+    line1.textContent = s.l1;
+    line2.textContent = s.l2;
+    bar.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.scene === id));
+  }, 260);
+
+  setTimeout(() => {
+    document.documentElement.classList.remove('is-wiping');
+    busy = false;
+  }, 560);
+}
+
+bar.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-scene]');
+  if (btn) setScene(btn.dataset.scene);
+});
+
+// 键盘 0-6 也能切，方便快速对比
+window.addEventListener('keydown', e => {
+  if (e.key >= '0' && e.key <= '6') setScene('s' + e.key);
+});
+</script>
+</body>
+</html>

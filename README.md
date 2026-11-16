@@ -10,19 +10,21 @@
 ```
 rewind/
 ├─ index.html          自检页（阶段五会被真正的标题页替换）
+├─ preview.html        场景主题预览页：七个场景一键切换，看切换手感
 ├─ css/
-│  ├─ base.css         底色、宋体、CRT 扫描线、正文与选项样式
+│  ├─ base.css         骨架：底色/字体/HUD/正文/选项（颜色全部走 CSS 变量）
+│  ├─ scenes.css       七套场景主题 + 雪花擦除切换
 │  └─ effects.css      七种文字特效：血/抖/吃/打字/闪/码/扫描
 ├─ js/
 │  ├─ engine.js        通用引擎（占位，阶段五实现）
 │  ├─ effects.js       特效执行层（占位）
 │  └─ save.js          双存档：game_save + meta_save（占位）
 ├─ data/
-│  ├─ script.json      全部剧情节点 + schema 自述
+│  ├─ script.json      全部剧情节点 + schema 自述（含 scene 字段）
 │  ├─ endings.json     5 个结局 + 路由表
 │  └─ meta.json        跨周目：标题变化、第二周目解锁、变体文本
 ├─ assets/             留给后续音频（当前为空）
-└─ docs/               需求、机制、大纲、分支结构（本项目的纸面）
+└─ docs/               需求、机制、大纲、分支结构、场景规范（本项目的纸面）
 ```
 
 ## 本地跑起来（三种方式，按推荐排序）
@@ -33,6 +35,8 @@ cd "C:\Users\user\Doubao\chats\2026-11-16\new-chat-1\rewind"
 python -m http.server 8000
 ```
 打开 <http://localhost:8000/index.html> → 点"自检"→ 应显示 **剧本节点数：2**。
+
+想看场景主题：打开 <http://localhost:8000/preview.html>，底部七个按钮可一键切换场景。
 
 **② VS Code Live Server**：右键 `index.html` → Open with Live Server。
 
