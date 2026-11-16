@@ -1,0 +1,54 @@
+{
+  "version": "0.1",
+  "说明": "meta_save 的规则表。只读取、只增不改，永不随'新游戏'清空。",
+
+  "title_stages": [
+    { "playthrough": 0, "title": "倒带" },
+    { "playthrough": 1, "title": "请勿倒带" },
+    { "playthrough": 2, "title": "已倒带 2 次" }
+  ],
+
+  "unlocks": [
+    {
+      "playthrough": 1,
+      "flag": "power_off",
+      "choice_label": "先把电视关掉",
+      "insert_after": "act4_start",
+      "note": "第二周目才出现的选项，通向 E4《玻璃》"
+    }
+  ],
+
+  "variants": [
+    {
+      "node": "e1",
+      "if": ["saw_frame"],
+      "text": "我早就见过这一幕。"
+    },
+    {
+      "node": "e1",
+      "if": ["suspect>=1"],
+      "text": "阿磊没有把刀放下。他不需要了。"
+    },
+    {
+      "node": "e2",
+      "if": ["heard_steps"],
+      "text": "刚才那个脚步声，是我自己的。"
+    },
+    {
+      "node": "e2",
+      "if": ["has_tape"],
+      "text": "我手里还攥着带子。沙发上那个人手里也有一盘。"
+    },
+    {
+      "node": "e3",
+      "if": ["playthrough>=1"],
+      "text": "这一集我好像看过。只是上次坐在这儿的人不是我。"
+    }
+  ],
+
+  "meta_notes": {
+    "unknown_handwriting": "这一盘，我替你放完了。",
+    "when": "第二周目存档界面显示，第十一节点之后出现",
+    "effect": "blood"
+  }
+}

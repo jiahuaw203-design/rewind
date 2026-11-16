@@ -1,0 +1,55 @@
+{
+  "version": "0.1",
+  "start": "demo_01",
+  "_schema": {
+    "说明": "这是剧本数据结构。阶段五填剧情时只改 nodes，不动结构。",
+    "node": {
+      "id": "节点唯一 id，建议 幕号_序号，如 a2_05",
+      "act": "所属幕：幕一…幕六 / 结局",
+      "speaker": "说话人，可省（省则视为旁白）",
+      "text": ["一行一段，不要换行符"],
+      "code": "右上角时间码，如 00:03:41；不填则沿用上一节点",
+      "effect": "none | flash | blood | shake | eaten | type（可数组叠加）",
+      "set": ["进入本节点时写入的 flag，如 has_tape"],
+      "choices": [
+        {
+          "label": "选项文字",
+          "next": "目标节点 id",
+          "kind": "story = 纯推进 | action = 会被 deviation 吃掉 | branch = 决定结局，禁止被 deviation 吃掉",
+          "lock": "条件 flag；不满足则此选项不显示",
+          "silent": "true 表示点了没反应（用于'他像没听见'）"
+        }
+      ],
+      "deviation": {
+        "mode": "swap = 点左边执行右边 | vanish = 选项自己消失 | rewrite = 文字被改",
+        "target": "mode=swap 时真正跳去的节点 id",
+        "once": "true 表示只发生一次，避免变成'每次都这样'的梗"
+      },
+      "ending": "走到底时填结局 id（E0–E4）"
+    }
+  },
+  "nodes": [
+    {
+      "id": "demo_01",
+      "act": "自检",
+      "speaker": "旁白",
+      "text": [
+        "1997 夏。这盘带子没有标签。",
+        "（这是一条示例节点，只用来验证数据结构能被正确读取。）"
+      ],
+      "code": "00:00:00",
+      "effect": ["type"],
+      "choices": [
+        { "label": "按播放", "next": "demo_02", "kind": "story" }
+      ]
+    },
+    {
+      "id": "demo_02",
+      "act": "自检",
+      "speaker": "字幕",
+      "text": ["请勿倒带。"],
+      "code": "00:00:07",
+      "effect": ["blood", "shake"]
+    }
+  ]
+}

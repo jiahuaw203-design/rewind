@@ -1,0 +1,127 @@
+/* effects.css —— 七种文字特效，全部纯 CSS，阶段五只需在引擎里挂 class
+   使用纪律（见 docs/阶段三_故事大纲_v2.md 第九节）：
+     .fx-blood  全篇 ≤ 5 次
+     .fx-shake  全篇 ≤ 4 次
+   用多了就变成装饰，不是恐惧。 */
+
+/* ── 1. 血色字 [血] ─────────────────────────────
+   出现时由灰渐变到红（0.8s），字距轻微错位。
+   不是鲜红，是干掉的红。 */
+.fx-blood {
+  color: var(--ink-blood);
+  letter-spacing: 0.045em;
+  text-shadow: 0 0 10px rgba(139, 15, 18, 0.35);
+  animation: blood-in 0.8s ease-out both;
+}
+
+@keyframes blood-in {
+  from { color: var(--ink); text-shadow: none; }
+  to   { color: var(--ink-blood); text-shadow: 0 0 10px rgba(139, 15, 18, 0.35); }
+}
+
+/* ── 2. 抖动 [抖] ───────────────────────────────
+   单字横向偏移 1–2px，像信号不稳。幅度必须极小。 */
+.fx-shake {
+  display: inline-block;
+  animation: shake-signal 0.24s steps(2, end) infinite;
+}
+
+@keyframes shake-signal {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-1.5px); }
+  50%  { transform: translateX(1px); }
+  75%  { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+/* ── 3. 被吃掉的字 [吃] ─────────────────────────
+   某几个字渐隐成背景色，只留一道浅痕。用于：被磨掉的"请"、
+   神隐的选项、第二周目的未解锁结局。 */
+.fx-eaten {
+  color: transparent;
+  text-shadow: 0 0 1px rgba(120, 112, 100, 0.35);
+  animation: eaten-out 0.6s ease-in both;
+}
+
+@keyframes eaten-out {
+  from { color: var(--ink); text-shadow: none; }
+  to   { color: transparent; text-shadow: 0 0 1px rgba(120, 112, 100, 0.35); }
+}
+
+/* ── 4. 打字机 [打字] ───────────────────────────
+   由 engine.js 逐字插入；这里只负责光标。 */
+.fx-type::after {
+  content: "▌";
+  color: var(--ink-dim);
+  animation: cursor 1s steps(1, end) infinite;
+}
+
+@keyframes cursor {
+  50% { opacity: 0; }
+}
+
+/* ── 5. 雪花转场 [闪] ───────────────────────────
+   全屏白噪点 0.25s。随机噪点用多层渐变近似，成本 0。 */
+.fx-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background:
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      rgba(255, 255, 255, 0.9) 0deg 0.6deg,
+      rgba(0, 0, 0, 0.9) 0.6deg 1.2deg
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.9) 0 1px,
+      rgba(0, 0, 0, 0.9) 1px 2px
+    );
+  background-blend-mode: overlay;
+  opacity: 0.9;
+  animation: flash-out 0.25s steps(3, end) both;
+}
+
+@keyframes flash-out {
+  from { opacity: 0.95; }
+  to   { opacity: 0; }
+}
+
+/* ── 6. 时间码惯性滚动 [码] ─────────────────────
+   数字变化时不是直接跳，是滚上去。由 engine.js 切数字，
+   这里给 .code 一个过渡时长。 */
+.code.rolling {
+  transition: transform 0.18s ease-out, opacity 0.18s ease-out;
+}
+
+/* ── 7. 显示屏老化的偶尔一道横线 ─────────────────
+   每 20s 左右划一次，随机位置，别太规律。 */
+.crt::before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+  z-index: 31;
+  animation: scan-drift 19s linear infinite;
+}
+
+@keyframes scan-drift {
+  0%   { top: 8%;  opacity: 0; }
+  6%   { opacity: 0.5; }
+  12%  { opacity: 0; }
+  55%  { top: 92%; opacity: 0; }
+  60%  { opacity: 0.35; }
+  66%  { opacity: 0; }
+  100% { top: 8%; opacity: 0; }
+}
+
+/* 可访问性：若系统开启"减少动态效果"，关掉抖动与扫描线 */
+@media (prefers-reduced-motion: reduce) {
+  .fx-shake { animation: none; }
+  .crt::before { animation: none; opacity: 0; }
+  .crt::after { background: none; }
+}

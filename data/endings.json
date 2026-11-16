@@ -1,0 +1,52 @@
+{
+  "version": "0.1",
+  "endings": [
+    { "id": "E0", "slot": "门口", "title": "没吃成",   "node": "e0", "hint": "门口" },
+    { "id": "E1", "slot": "客厅", "title": "看完",     "node": "e1", "hint": "客厅" },
+    { "id": "E2", "slot": "门",   "title": "剪辑",     "node": "e2", "hint": "门" },
+    { "id": "E3", "slot": "包",   "title": "带走",     "node": "e3", "hint": "包" },
+    { "id": "E4", "slot": "玻璃", "title": "玻璃",     "node": "e4", "hint": "玻璃" }
+  ],
+  "router": [
+    {
+      "id": "R4",
+      "when": "before_act4",
+      "if": ["playthrough>=1", "power_off"],
+      "ending": "E4",
+      "note": "第二周目专属：第四轮播放前关掉电视，直接进 E4，不再走终局"
+    },
+    {
+      "id": "R0",
+      "when": "ending",
+      "if": ["left_early"],
+      "ending": "E0",
+      "note": "幕一坚持离开"
+    },
+    {
+      "id": "R1",
+      "when": "ending",
+      "if": ["has_tape"],
+      "ending": "E3",
+      "note": "幕五把带子拔走"
+    },
+    {
+      "id": "R2",
+      "when": "ending",
+      "if": ["final_choice:stay"],
+      "ending": "E1",
+      "note": "终局站着不动"
+    },
+    {
+      "id": "R3",
+      "when": "ending",
+      "if": ["final_choice:run"],
+      "ending": "E2",
+      "note": "终局往门口跑"
+    }
+  ],
+  "collection_ui": {
+    "counter": "已播放：{n} / 5",
+    "locked_label": "未播放",
+    "locked_effect": "eaten"
+  }
+}

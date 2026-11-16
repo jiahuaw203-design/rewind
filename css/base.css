@@ -1,0 +1,145 @@
+/* base.css —— 底色、字体、CRT 层、正文与按钮的基础样式
+   只做"看起来像 1997 年的一台彩电"，不含任何剧情逻辑。 */
+
+:root {
+  --bg: #080807;
+  --ink: #cfc7b6;          /* 正文：旧纸/荧光粉的暖灰 */
+  --ink-dim: #7d766b;
+  --ink-blood: #8b0f12;    /* 血色：不是鲜红，是干掉的红 */
+  --code: #4ee08a;         /* 时间码绿，老录像机那种偏黄的绿 */
+  --line: #23211d;
+  --font: "SimSun", "Songti SC", "Noto Serif CJK SC", serif;
+  --font-mono: "Consolas", "Courier New", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  letter-spacing: 0.04em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 全屏 CRT 容器：四角暗角 + 扫描线 */
+.crt {
+  position: relative;
+  min-height: 100%;
+  padding: 28px clamp(20px, 5vw, 64px);
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(255, 240, 200, 0.05), transparent 60%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.85) 100%),
+    var(--bg);
+  overflow: hidden;
+}
+
+/* 扫描线：极轻，读久了不累 */
+.crt::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.035) 0px,
+    rgba(255, 255, 255, 0.035) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+  z-index: 30;
+}
+
+/* 顶部 HUD：左边片名，右边时间码 */
+.hud {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+  margin-bottom: 34px;
+}
+
+.hud-title {
+  font-size: 15px;
+  color: var(--ink-dim);
+  letter-spacing: 0.3em;
+}
+
+/* 时间码：等宽、绿色、常驻右上 */
+.code {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--code);
+  letter-spacing: 0.12em;
+  opacity: 0.9;
+}
+
+/* 正文区：窄栏，像看一台 4:3 的电视，不像在刷网页 */
+.screen {
+  max-width: 640px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+.line {
+  margin: 0 0 18px;
+  font-size: 19px;
+  line-height: 2;
+  text-indent: 0;
+}
+
+.line.dim { color: var(--ink-dim); }
+
+/* 选项区 */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 34px 0 26px;
+}
+
+.choice {
+  appearance: none;
+  text-align: left;
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-left: 2px solid #3a352c;
+  padding: 12px 16px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.choice:hover,
+.choice:focus-visible {
+  background: rgba(207, 199, 182, 0.06);
+  border-left-color: var(--ink-dim);
+  outline: none;
+}
+
+/* 日志/调试区 */
+.log {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ink-dim);
+  white-space: pre-wrap;
+  border-left: 1px solid var(--line);
+  padding: 4px 0 4px 14px;
+  margin: 0 0 30px;
+}
+
+.footer-note {
+  font-size: 13px;
+  color: #514b42;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
