@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-scene="s1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>请勿倒带 · 工程自检</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/scenes.css">
+<link rel="stylesheet" href="css/effects.css">
+</head>
+<body>
+<div class="tex"></div>
+<div class="wipe"></div>
+<div class="wipe-label" id="wipeLabel"></div>
+<div class="crt">
+  <header class="hud">
+    <span class="hud-title">请勿倒带 · 自检</span>
+    <span class="code" id="timecode">00:00:00</span>
+  </header>
+
+  <main class="screen">
+    <p class="line dim">1997 夏 · 家用录像</p>
+    <p class="line">这一页不是游戏，是自检页：确认浏览器、编码、相对路径、数据文件都通。</p>
+    <p class="line dim">游戏本体在 <a href="index.html" style="color:inherit">index.html</a>。</p>
+
+    <div class="choices">
+      <button class="choice" id="btn-check">自检：读取三份 JSON</button>
+    </div>
+
+    <pre class="log" id="log">等待自检……</pre>
+
+    <p class="footer-note">阶段五起，本页退居二线，只在怀疑"数据文件是不是坏了"的时候用。</p>
+  </main>
+</div>
+
+<script>
+const logEl = document.getElementById('log');
+const tcEl = document.getElementById('timecode');
+
+document.getElementById('btn-check').addEventListener('click', async () => {
+  logEl.textContent = '读取中……';
+  try {
+    const files = ['data/script.json', 'data/endings.json', 'data/meta.json'];
+    const out = [];
+    let script = null;
+    for (const f of files) {
+      const res = await fetch(f, { cache: 'no-store' });
+      if (!res.ok) throw new Error(f + ' → HTTP ' + res.status);
+      const data = await res.json();
+      if (f.endsWith('script.json')) script = data;
+      out.push('✅ ' + f + '　' + JSON.stringify(data).length + ' 字节');
+    }
+    const nodes = (script.nodes || []).length;
+    const endings = new Set((script.nodes || []).filter(n => n.ending).map(n => n.ending));
+    logEl.textContent = out.join('\n') + '\n\n' +
+      '剧本节点数：' + nodes + '\n' +
+      '起始节点：' + (script.start || '—') + '\n' +
+      '剧本内结局：' + [...endings].sort().join(' / ') + '\n\n' +
+      '环境正常。';
+  } catch (err) {
+    logEl.textContent =
+      '❌ 读取失败\n' + err.message + '\n\n' +
+      '若是用 file:// 直接双击打开，浏览器会拦截本地 JSON 读取（CORS）。\n' +
+      '请改用本地服务器：\n' +
+      '  python -m http.server 8000\n' +
+      '然后访问 http://localhost:8000/check.html';
+  }
+});
+
+let t = 0;
+setInterval(() => {
+  t = (t + 1) % 43200;
+  const h = String(Math.floor(t / 3600)).padStart(2, '0');
+  const m = String(Math.floor((t % 3600) / 60)).padStart(2, '0');
+  const s = String(t % 60).padStart(2, '0');
+  tcEl.textContent = h + ':' + m + ':' + s;
+}, 1000);
+</script>
+</body>
+</html>

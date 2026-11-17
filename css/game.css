@@ -1,0 +1,139 @@
+/* game.css —— 游戏界面层：标题页 / 正文块 / 说话人 / 结局页 / 收集页
+   色彩一律走 base.css 的变量，跟着场景变。这里只管版式与入场节奏。 */
+
+/* ── 正文块 ── */
+.textblock {
+  position: relative;
+}
+
+.speaker {
+  margin: 0 0 10px;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+/* 说话人下面那道小横线，像字幕条 */
+.speaker::after {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 1px;
+  margin-top: 8px;
+  background: var(--line);
+}
+
+/* 跨周目变体：只有"被录进去过的人"才看到的一句，给一点血味 */
+.variant {
+  margin-top: 26px;
+  color: var(--ink-blood);
+  opacity: 0.92;
+}
+
+/* 结局收尾那一句：全篇最重的一次血字，字号比正文大一号 */
+.end-text {
+  margin: 40px 0 14px;
+  font-size: 24px;
+  line-height: 1.9;
+  letter-spacing: 0.08em;
+  min-height: 1.9em;
+}
+
+/* ── 标题页 ── */
+.title-card {
+  padding: 6vh 0 0;
+  text-align: left;
+}
+
+.big-title {
+  margin: 0 0 26px;
+  font-size: clamp(40px, 7vw, 76px);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  line-height: 1.2;
+  color: var(--ink);
+  text-shadow: 0 0 26px color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
+.note-meta {
+  margin-top: 30px;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+}
+
+/* ── 结局卡 ── */
+.ending-card {
+  margin-top: 34px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+
+.ending-kicker {
+  margin: 0 0 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--ink-dim);
+}
+
+/* ── 收集页 ── */
+.collection-title {
+  margin: 4vh 0 26px;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  color: var(--ink);
+}
+
+.collection-list {
+  list-style: none;
+  margin: 0 0 26px;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.collection-item {
+  display: flex;
+  gap: 20px;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.collection-item.locked {
+  opacity: 0.55;
+}
+
+.slot {
+  flex: 0 0 72px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--ink-dim);
+}
+
+.slot-title {
+  font-size: 17px;
+  letter-spacing: 0.06em;
+}
+
+/* ── 选项入场：逐个浮上来，延迟由引擎按序号给 ── */
+.choice {
+  animation: choice-in 0.4s ease-out both;
+}
+
+@keyframes choice-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 读取失败卡 ── */
+.error-card .line {
+  font-size: 17px;
+}
+
+/* ── 减少动态效果 ── */
+@media (prefers-reduced-motion: reduce) {
+  .choice { animation: none; }
+}

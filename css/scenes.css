@@ -176,6 +176,17 @@
 html.is-wiping .wipe { animation: wipe-run 0.55s ease-out both; }
 html.is-wiping .wipe-label { animation: wipe-label-run 0.55s ease-out both; }
 
+/* ── 血字在暗场景要提亮半档 ──
+   基础色 #8b0f12 放在 s1 暖黄上正好，落在 s4 的近黑里就快看不见了。
+   同一个"干掉的红"，在暗处必须亮一点，否则玩家读不出来，恐怖就变成看不清。 */
+[data-scene="s0"],
+[data-scene="s2"],
+[data-scene="s3"],
+[data-scene="s4"],
+[data-scene="s6"] {
+  --ink-blood: #b32a20;
+}
+
 /* 减少动态效果时，切换只做一次淡出 */
 @media (prefers-reduced-motion: reduce) {
   html.is-wiping .wipe { animation: none; opacity: 0; }

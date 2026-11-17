@@ -1,8 +1,9 @@
 {
-  "version": "0.2",
-  "start": "demo_01",
+  "version": "1.0",
+  "title": "请勿倒带",
+  "start": "a1_01",
   "_schema": {
-    "说明": "这是剧本数据结构。阶段五填剧情时只改 nodes，不动结构。",
+    "说明": "剧本唯一源头。改剧情只改 nodes，不动引擎。",
     "scene_table": {
       "s0": "楼道 —— 冷、湿、声控灯",
       "s1": "客厅 —— 暖黄、过曝、格纹桌布",
@@ -13,55 +14,1072 @@
       "s6": "白屏 —— 过曝的白"
     },
     "node": {
-      "id": "节点唯一 id，建议 幕号_序号，如 a2_05",
-      "act": "所属幕：幕一…幕六 / 结局",
-      "scene": "场景编号 s0–s6；与上一节点不同时会触发一次场景切换（雪花擦除 0.55s）",
-      "speaker": "说话人，可省（省则视为旁白）",
-      "text": ["一行一段，不要换行符"],
-      "code": "右上角时间码，如 00:03:41；不填则沿用上一节点",
-      "effect": "none | flash | blood | shake | eaten | type（可数组叠加）",
-      "set": ["进入本节点时写入的 flag，如 has_tape"],
-      "choices": [
-        {
-          "label": "选项文字",
-          "next": "目标节点 id",
-          "kind": "story = 纯推进 | action = 会被 deviation 吃掉 | branch = 决定结局，禁止被 deviation 吃掉",
-          "lock": "条件 flag；不满足则此选项不显示",
-          "silent": "true 表示点了没反应（用于'他像没听见'）"
-        }
-      ],
-      "deviation": {
-        "mode": "swap = 点左边执行右边 | vanish = 选项自己消失 | rewrite = 文字被改",
-        "target": "mode=swap 时真正跳去的节点 id",
-        "once": "true 表示只发生一次，避免变成'每次都这样'的梗"
-      },
-      "ending": "走到底时填结局 id（E0–E4）"
+      "id": "幕号_序号",
+      "act": "幕一…幕六 / 结局",
+      "scene": "s0–s6，与上一节点不同时触发一次场景切换",
+      "speaker": "说话人，省略则视为旁白",
+      "text": "一行一段",
+      "code": "右上角时间码",
+      "effect": "none|flash|blood|shake|eaten|type，可数组叠加",
+      "set": "进入本节点写入的 flag",
+      "choices": "label / next / kind(story|action|branch) / lock / silent / label_effect",
+      "deviation": "mode(swap|vanish|rewrite) / target / once",
+      "ending": "结局 id（走到底的节点才填）",
+      "end_text": "结局最后打出的那一行（血字）",
+      "end_note": "结局左下角的小字（可不填）"
     }
   },
   "nodes": [
     {
-      "id": "demo_01",
-      "act": "自检",
-      "scene": "s1",
-      "speaker": "旁白",
+      "id": "a1_01",
+      "act": "幕一",
+      "scene": "s0",
       "text": [
-        "1997 夏。这盘带子没有标签。",
-        "（这是一条示例节点，只用来验证数据结构能被正确读取。）"
+        "1997 年 7 月，下午四点。",
+        "楼道里没有风。声控灯不亮，要跺一下脚才亮。",
+        "门后面有电视的声音，很轻，像隔了一层棉被。"
       ],
       "code": "00:00:00",
       "effect": ["type"],
       "choices": [
-        { "label": "按播放", "next": "demo_02", "kind": "story" }
+        { "label": "敲门", "next": "a1_02", "kind": "story" },
+        { "label": "站在门口再听一会儿", "next": "a1_01b", "kind": "story" }
       ]
     },
     {
-      "id": "demo_02",
-      "act": "自检",
+      "id": "a1_01b",
+      "act": "幕一",
+      "scene": "s0",
+      "text": [
+        "我听了一会儿。",
+        "不是电视节目。是那种什么都没有的、雪花的声音。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "敲门", "next": "a1_02", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a1_02",
+      "act": "幕一",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "进来吧。鞋不用换。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "进去", "next": "a1_03", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a1_03",
+      "act": "幕一",
+      "scene": "s1",
+      "text": [
+        "客厅很暖。暖得有点过头。",
+        "塑料桌布上有格子。玻璃茶几上有一圈没擦干的水渍。转页风扇在转，转得有气无力。",
+        "彩电后盖的散热孔在响，像有人在里面很小声地吹气。冰箱在嗡嗡。墙上的挂历停在七月。",
+        "猫在窗台上，白猫，不看我。狗在脚边，土狗，黄的，我一进门它就摇尾巴。",
+        "电视开着。没有画面，只有雪花。"
+      ],
+      "code": "00:00:00",
+      "effect": ["type"],
+      "choices": [
+        { "label": "坐下", "next": "a1_04", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a1_04",
+      "act": "幕一",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "你等会儿啊。我俩一会儿出去吃饭。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "好", "next": "a1_05", "kind": "story" },
+        { "label": "现在就去吧", "next": "a1_04b", "kind": "story" },
+        { "label": "你家猫叫什么", "next": "a1_04c", "kind": "action", "silent": true }
+      ]
+    },
+    {
+      "id": "a1_04b",
+      "act": "幕一",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "急什么。再等十分钟。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "好", "next": "a1_05", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a1_04c",
+      "act": "幕一",
+      "scene": "s1",
+      "text": [
+        "他没有回答。",
+        "他把电视的音量调大了一格。",
+        "雪花的声音变大了一点点。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "好", "next": "a1_05", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a1_05",
+      "act": "幕一",
+      "scene": "s1",
+      "text": [
+        "他进了厨房。",
+        "客厅里只剩我、一只猫、一条狗，和一台雪花电视。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "看茶几下面", "next": "a1_06", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a1_06",
+      "act": "幕一",
+      "scene": "s1",
+      "text": [
+        "茶几下面有一盘带子。",
+        "没有标签。带盒侧面有一行手写字，第一个字被磨掉了。",
+        "剩下的三个字是：倒带。"
+      ],
+      "code": "00:00:00",
+      "effect": ["eaten"],
+      "choices": [
+        { "label": "放进录像机", "next": "a2_01", "kind": "story" },
+        { "label": "喊一声阿磊", "next": "a1_06b", "kind": "story" },
+        { "label": "不动它", "next": "a1_07", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a1_06b",
+      "act": "幕一",
+      "scene": "s1",
+      "text": [
+        "没人应。",
+        "雪花声大了一格。",
+        "厨房里没有动静。连切菜的声音都没有。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "放进录像机", "next": "a2_01", "kind": "story" },
+        { "label": "喊一声阿磊", "next": "a1_06b", "kind": "story" },
+        { "label": "不动它", "next": "a1_07", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a1_07",
+      "act": "幕一",
+      "scene": "s1",
+      "text": [
+        "我没有碰它。",
+        "风扇停了一秒。又转起来。",
+        "阿磊从厨房出来，手里拿着那盘带子。",
+        "他把它塞进了机器。"
+      ],
+      "code": "00:00:00",
+      "effect": ["shake"],
+      "set": ["tape_forced"],
+      "choices": [
+        { "label": "……", "next": "a2_01", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a2_01",
+      "act": "幕二",
+      "scene": "s2",
+      "text": [
+        "我按了播放。",
+        "右上角跳出时间码：00:00:00。",
+        "全屏雪花。"
+      ],
+      "code": "00:00:00",
+      "effect": ["flash"],
+      "choices": [
+        { "label": "等", "next": "a2_02", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a2_02",
+      "act": "幕二",
       "scene": "s2",
       "speaker": "字幕",
-      "text": ["请勿倒带。"],
+      "text": [
+        "1997 夏",
+        "什么都没有。",
+        "雪花不是均匀的。它有呼吸。"
+      ],
       "code": "00:00:07",
-      "effect": ["blood", "shake"]
+      "effect": ["type"],
+      "choices": [
+        { "label": "快进", "next": "a2_03", "kind": "action" },
+        { "label": "倒回去", "next": "a2_03b", "kind": "action" },
+        { "label": "关掉", "next": "a2_04", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a2_03",
+      "act": "幕二",
+      "scene": "s2",
+      "text": [
+        "时间码一路跳到 00:07:00。",
+        "就在那一格，闪了一下。",
+        "太快了。好像是个背影，坐在沙发上。",
+        "也可能是我眼花。"
+      ],
+      "code": "00:07:00",
+      "effect": ["flash", "shake"],
+      "set": ["saw_frame"],
+      "choices": [
+        { "label": "倒回去看", "next": "a2_04", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a2_03b",
+      "act": "幕二",
+      "scene": "s2",
+      "text": [
+        "时间码回到 00:00:00。",
+        "一切都重来了。",
+        "但这一次，雪花里有拖鞋在地板上走的声音。一步，一步。"
+      ],
+      "code": "00:00:00",
+      "set": ["heard_steps"],
+      "choices": [
+        { "label": "……", "next": "a2_04", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a2_04",
+      "act": "幕二",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "走吧，吃饭。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "你这带子哪来的", "next": "a2_05", "kind": "branch" },
+        { "label": "刚才什么都没录", "next": "a2_05b", "kind": "story" },
+        { "label": "好", "next": "a2_06", "kind": "story" },
+        { "label": "我要走了", "next": "a2_07", "kind": "branch" }
+      ]
+    },
+    {
+      "id": "a2_05",
+      "act": "幕二",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "他看了茶几一眼。茶几上是空的。",
+        "哪个带子？"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "……", "next": "a2_06", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a2_05b",
+      "act": "幕二",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "那可能是坏了吧。",
+        "他把带子从机器里拿出来，放回茶几下面。"
+      ],
+      "code": "00:00:00",
+      "set": ["tape_back"],
+      "choices": [
+        { "label": "……", "next": "a2_06", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a2_07",
+      "act": "幕二",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "就吃个饭。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "还是算了", "next": "e0", "kind": "branch", "label_effect": "eaten" },
+        { "label": "行吧", "next": "a2_06", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a2_06",
+      "act": "幕二",
+      "scene": "s1",
+      "text": [
+        "四十分钟后。"
+      ],
+      "code": "00:00:00",
+      "effect": ["flash"],
+      "choices": [
+        { "label": "回家", "next": "a3_01", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_01",
+      "act": "幕三",
+      "scene": "s1",
+      "text": [
+        "灯亮着。菜在桌上，一筷子都没动过。",
+        "狗不在门口。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "叫它的名字", "next": "a3_02", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_02",
+      "act": "幕三",
+      "scene": "s1",
+      "text": [
+        "我叫了两声。",
+        "没有爪子的声音。",
+        "冰箱在响。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "问阿磊，狗呢", "next": "a3_04", "kind": "action", "label_effect": "shake" },
+        { "label": "自己找一圈", "next": "a3_05", "kind": "story" },
+        { "label": "直接放带子", "next": "a3_06", "kind": "story" }
+      ],
+      "deviation": {
+        "mode": "swap",
+        "target": "a3_04",
+        "once": true
+      }
+    },
+    {
+      "id": "a3_04",
+      "act": "幕三",
+      "scene": "s1",
+      "text": [
+        "我张了张嘴。",
+        "没有出声。",
+        "阿磊：怎么了？",
+        "我：没事。"
+      ],
+      "code": "00:00:00",
+      "set": ["mute"],
+      "effect": ["shake"],
+      "choices": [
+        { "label": "……", "next": "a3_06", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_05",
+      "act": "幕三",
+      "scene": "s1",
+      "text": [
+        "阳台、卧室、卫生间，都找过。",
+        "狗窝是热的。"
+      ],
+      "code": "00:00:00",
+      "set": ["found_warm"],
+      "choices": [
+        { "label": "打开录像机", "next": "a3_06", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_06",
+      "act": "幕三",
+      "scene": "s2",
+      "text": [
+        "我按了播放。",
+        "00:00:00。",
+        "画面是这个客厅。这个角度。这盏灯。"
+      ],
+      "code": "00:00:00",
+      "effect": ["flash"],
+      "choices": [
+        { "label": "看下去", "next": "a3_07", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_07",
+      "act": "幕三",
+      "scene": "s2",
+      "text": [
+        "一条黄狗在地板上转圈。",
+        "转了三圈，停下，对着镜头叫了一声。",
+        "字幕只有一个字：汪。"
+      ],
+      "code": "00:01:12",
+      "effect": ["type"],
+      "choices": [
+        { "label": "看下去", "next": "a3_08", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_08",
+      "act": "幕三",
+      "scene": "s2",
+      "text": [
+        "狗走进厨房。",
+        "厨房门关上。",
+        "画面变成厨房的门。"
+      ],
+      "code": "00:02:40",
+      "choices": [
+        { "label": "跟过去", "next": "a3_09", "kind": "story" },
+        { "label": "暂停", "next": "a3_09b", "kind": "action" },
+        { "label": "叫阿磊来看", "next": "a3_09c", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_09",
+      "act": "幕三",
+      "scene": "s2",
+      "text": [
+        "我走过去，站在厨房门口。",
+        "厨房里没有狗。",
+        "什么都没有。"
+      ],
+      "code": "00:02:55",
+      "choices": [
+        { "label": "回到客厅", "next": "a3_10", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_09b",
+      "act": "幕三",
+      "scene": "s2",
+      "text": [
+        "我按了暂停。",
+        "画面继续走。时间码继续跳。",
+        "按钮没有反应。或者说，它不需要听我的。"
+      ],
+      "code": "00:03:10",
+      "effect": ["shake"],
+      "choices": [
+        { "label": "……", "next": "a3_10", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_09c",
+      "act": "幕三",
+      "scene": "s2",
+      "speaker": "阿磊",
+      "text": [
+        "他站在门口，看了三秒。",
+        "这有什么好看的。"
+      ],
+      "code": "00:03:20",
+      "set": ["calm_friend"],
+      "choices": [
+        { "label": "……", "next": "a3_10", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_10",
+      "act": "幕三",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "好奇怪啊。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "……", "next": "a3_11", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_11",
+      "act": "幕三",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "我想喝点啤酒。你跟我去买。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "好", "next": "a3_12", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a3_12",
+      "act": "幕三",
+      "scene": "s1",
+      "text": [
+        "带子自己倒回去了。机械声很响。",
+        "时间码回到 00:00:00。"
+      ],
+      "code": "00:00:00",
+      "effect": ["flash"],
+      "choices": [
+        { "label": "出门", "next": "a4_01", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_01",
+      "act": "幕四",
+      "scene": "s1",
+      "text": [
+        "楼下小卖部。来回十分钟。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "回家", "next": "a4_02", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_02",
+      "act": "幕四",
+      "scene": "s1",
+      "text": [
+        "猫不在窗台了。",
+        "猫的碗是满的，碗被推到地上。",
+        "地上没有洒出来什么。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "猫呢", "next": "a4_03", "kind": "story" },
+        { "label": "把带子拿出来", "next": "a4_04", "kind": "action" },
+        { "label": "坐下，喝啤酒", "next": "a4_03", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_04",
+      "act": "幕四",
+      "scene": "s1",
+      "text": [
+        "带子卡在机器里。",
+        "拿不出来。",
+        "我用了点力气。手指被划了一下，没有出血。"
+      ],
+      "code": "00:00:00",
+      "set": ["tape_stuck"],
+      "choices": [
+        { "label": "算了", "next": "a4_03", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_03",
+      "act": "幕四",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "咱俩继续看吧。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "……", "next": "a4_03b", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_03b",
+      "act": "幕四",
+      "scene": "s1",
+      "text": [
+        "他没有找猫。",
+        "他把啤酒放在桌上。一口没喝。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "打开录像机", "next": "a4_05", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_05",
+      "act": "幕四",
+      "scene": "s2",
+      "text": [
+        "狗在客厅。",
+        "猫跟在后面。",
+        "镜头一直在往前推，推向厨房的门。推得很慢，像有人端着机器在走。"
+      ],
+      "code": "00:04:10",
+      "effect": ["flash"],
+      "choices": [
+        { "label": "看下去", "next": "a4_06", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_06",
+      "act": "幕四",
+      "scene": "s2",
+      "speaker": "字幕",
+      "text": [
+        "它们知道门后面有什么。"
+      ],
+      "code": "00:05:30",
+      "effect": ["type"],
+      "choices": [
+        { "label": "看下去", "next": "a4_07", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_07",
+      "act": "幕四",
+      "scene": "s2",
+      "text": [
+        "录像里有脚步声。",
+        "镜头后面有东西在走。很慢。拖鞋。一步。一步。"
+      ],
+      "code": "00:06:02",
+      "effect": ["shake"],
+      "choices": [
+        { "label": "回头看身后", "next": "a4_08", "kind": "story" },
+        { "label": "盯着屏幕", "next": "a4_08b", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_08",
+      "act": "幕四",
+      "scene": "s2",
+      "text": [
+        "身后是空的客厅。风扇在转。",
+        "我回头看屏幕。",
+        "时间码已经跳到 00:09:40。刚才那一段我没看到。"
+      ],
+      "code": "00:09:40",
+      "set": ["time_skip"],
+      "effect": ["flash"],
+      "choices": [
+        { "label": "……", "next": "a4_09", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_08b",
+      "act": "幕四",
+      "scene": "s2",
+      "text": [
+        "脚步声停在镜头后面。",
+        "不动了。",
+        "它一直站在那儿。"
+      ],
+      "code": "00:06:20",
+      "choices": [
+        { "label": "……", "next": "a4_09", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_09",
+      "act": "幕四",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "没有反应。",
+        "困了。咱睡吧。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "你不觉得这带子有问题吗", "next": "a4_10", "kind": "story" },
+        { "label": "好", "next": "a4_11", "kind": "story" },
+        { "label": "我要走了", "next": "a4_10b", "kind": "branch" }
+      ]
+    },
+    {
+      "id": "a4_10",
+      "act": "幕四",
+      "scene": "s1",
+      "speaker": "阿磊",
+      "text": [
+        "什么问题？",
+        "……什么问题？"
+      ],
+      "code": "00:00:00",
+      "effect": ["shake"],
+      "set": ["asked_twice"],
+      "choices": [
+        { "label": "……", "next": "a4_11", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_10b",
+      "act": "幕四",
+      "scene": "s1",
+      "text": [
+        "门把手转不动。",
+        "门没有锁。"
+      ],
+      "code": "00:00:00",
+      "set": ["tried_leave"],
+      "choices": [
+        { "label": "……", "next": "a4_11", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a4_11",
+      "act": "幕五",
+      "scene": "s1",
+      "text": [
+        "我去洗个澡。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "……", "next": "a5_01", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a5_01",
+      "act": "幕五",
+      "scene": "s1",
+      "text": [
+        "水声很大。",
+        "隔着门，客厅的电视还开着。滋——",
+        "热水器点火的声音，像有人在门外吸了一口气。"
+      ],
+      "code": "00:00:00",
+      "effect": ["type"],
+      "choices": [
+        { "label": "洗完", "next": "a5_02", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a5_02",
+      "act": "幕五",
+      "scene": "s4",
+      "text": [
+        "客厅很安静。",
+        "电视是黑的。",
+        "茶几上三罐啤酒。一罐开了，没喝。"
+      ],
+      "code": "00:00:00",
+      "effect": ["flash"],
+      "choices": [
+        { "label": "喊他", "next": "a5_03", "kind": "story" },
+        { "label": "去厨房看看", "next": "a5_04", "kind": "story" },
+        { "label": "打开录像机", "next": "a6_01", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a5_03",
+      "act": "幕五",
+      "scene": "s4",
+      "text": [
+        "只有冰箱的嗡嗡声。",
+        "狗窝空着。猫的碗在地上。",
+        "然后，录像机自己咔了一声。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "打开录像机", "next": "a5_02b", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a5_04",
+      "act": "幕五",
+      "scene": "s3",
+      "text": [
+        "厨房是干净的。",
+        "砧板是干的。",
+        "刀架上少了一把刀。"
+      ],
+      "code": "00:00:00",
+      "set": ["saw_knife"],
+      "effect": ["shake"],
+      "choices": [
+        { "label": "回到客厅", "next": "a5_02b", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a5_02b",
+      "act": "幕五",
+      "scene": "s4",
+      "text": [
+        "客厅还是空的。",
+        "录像机还在转。它一直在放。"
+      ],
+      "code": "00:00:00",
+      "choices": [
+        { "label": "打开录像机", "next": "a6_01", "kind": "story" },
+        { "label": "用力拔出来，装进包里", "next": "e3", "kind": "branch", "lock": "tape_stuck" }
+      ]
+    },
+    {
+      "id": "a6_01",
+      "act": "幕六",
+      "scene": "s2",
+      "text": [
+        "我按了播放。",
+        "时间码不是 00:00:00。",
+        "是 00:07:20。"
+      ],
+      "code": "00:07:20",
+      "effect": ["flash"],
+      "choices": [
+        { "label": "按倒带", "next": "a6_02", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_02",
+      "act": "幕六",
+      "scene": "s2",
+      "text": [
+        "时间码变成 00:07:21。",
+        "往前走了 1 秒。"
+      ],
+      "code": "00:07:21",
+      "effect": ["shake"],
+      "choices": [
+        { "label": "……", "next": "a6_03", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_03",
+      "act": "幕六",
+      "scene": "s3",
+      "text": [
+        "厨房。",
+        "阿磊在剁肉。",
+        "狗在旁边吃骨头。猫在旁边吃肠子。"
+      ],
+      "code": "00:08:05",
+      "effect": ["type"],
+      "choices": [
+        { "label": "……", "next": "a6_04", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_04",
+      "act": "幕六",
+      "scene": "s3",
+      "speaker": "字幕",
+      "text": [
+        "咚。",
+        "咚。",
+        "咚——"
+      ],
+      "code": "00:08:30",
+      "effect": ["type"],
+      "choices": [
+        { "label": "……", "next": "a6_05", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_05",
+      "act": "幕六",
+      "scene": "s3",
+      "text": [
+        "我的胃在响。",
+        "屏幕里的声音，和客厅里的声音，是同一个。",
+        "厨房方向真的有人在剁东西。"
+      ],
+      "code": "00:08:40",
+      "effect": ["shake"],
+      "choices": [
+        { "label": "关掉电视", "next": "a6_06", "kind": "action", "label_effect": "eaten" },
+        { "label": "后退", "next": "a6_07", "kind": "story" },
+        { "label": "再靠近一点", "next": "a6_07b", "kind": "story" }
+      ],
+      "deviation": {
+        "mode": "swap",
+        "target": "a6_06",
+        "once": true
+      }
+    },
+    {
+      "id": "a6_06",
+      "act": "幕六",
+      "scene": "s3",
+      "text": [
+        "我往前走了一步。",
+        "我没有要往前。"
+      ],
+      "code": "00:08:45",
+      "effect": ["shake"],
+      "choices": [
+        { "label": "……", "next": "a6_08", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_07",
+      "act": "幕六",
+      "scene": "s3",
+      "text": [
+        "我往后退了半步。",
+        "屏幕变远了。可画面里的人没有变小。"
+      ],
+      "code": "00:08:48",
+      "choices": [
+        { "label": "……", "next": "a6_08", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_07b",
+      "act": "幕六",
+      "scene": "s3",
+      "text": [
+        "我离电视更近了一点。",
+        "屏幕上的阿磊变大了。",
+        "也可能不是我靠近了，是镜头在推。"
+      ],
+      "code": "00:08:50",
+      "choices": [
+        { "label": "……", "next": "a6_08", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_08",
+      "act": "幕六",
+      "scene": "s3",
+      "text": [
+        "画面里，阿磊停下刀。",
+        "他转过身。正对镜头。",
+        "他的脸看不清。不是没有五官，是曝光过度，白成一片。"
+      ],
+      "code": "00:09:00",
+      "effect": ["flash"],
+      "choices": [
+        { "label": "……", "next": "a6_09", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_09",
+      "act": "幕六",
+      "scene": "s3",
+      "speaker": "字幕",
+      "text": [
+        "他看见我了。"
+      ],
+      "code": "00:09:10",
+      "effect": ["blood", "shake"],
+      "choices": [
+        { "label": "……", "next": "a6_10", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_10",
+      "act": "幕六",
+      "scene": "s3",
+      "text": [
+        "我一回头。"
+      ],
+      "code": "00:09:12",
+      "effect": ["flash"],
+      "choices": [
+        { "label": "……", "next": "a6_11", "kind": "story" }
+      ]
+    },
+    {
+      "id": "a6_11",
+      "act": "幕六",
+      "scene": "s3",
+      "text": [
+        "阿磊站在我身后，举着刀。",
+        "刀上什么都没有。",
+        "他的脸也是这样，看不清。"
+      ],
+      "code": "00:09:14",
+      "effect": ["none"],
+      "choices": [
+        { "label": "别回头", "next": "a6_12", "kind": "story", "label_effect": "blood" }
+      ]
+    },
+    {
+      "id": "a6_12",
+      "act": "幕六",
+      "scene": "s3",
+      "text": [
+        "已经回头了。"
+      ],
+      "code": "00:09:15",
+      "effect": ["blood"],
+      "choices": [
+        { "label": "站着不动", "next": "e1", "kind": "branch" },
+        { "label": "往门口跑", "next": "e2", "kind": "branch" },
+        { "label": "先把电视关掉", "next": "e4", "kind": "branch", "lock": "power_off" }
+      ]
+    },
+    {
+      "id": "e0",
+      "act": "结局",
+      "scene": "s0",
+      "text": [
+        "我下了楼。",
+        "楼道的声控灯一直没亮。我在黑里走完了四层。",
+        "门后面电视的声音，一直响到十二点。",
+        "第二天早上，我家门口的地上，放着一盘带子。",
+        "没有标签。"
+      ],
+      "code": "00:00:00",
+      "effect": ["type"],
+      "ending": "E0",
+      "end_text": "下一顿，我等你。"
+    },
+    {
+      "id": "e1",
+      "act": "结局",
+      "scene": "s6",
+      "text": [
+        "刀落下来之前，屏幕先白了。",
+        "然后是很久以前的暖黄。",
+        "风扇在转。挂历停在七月。",
+        "我坐在沙发上，手里拿着遥控器。电视里有画面了。",
+        "画面里，有人推开门进来，换鞋，坐下。"
+      ],
+      "code": "00:00:00",
+      "effect": ["flash"],
+      "ending": "E1",
+      "end_text": "这盘带子没有标签。",
+      "end_note": "第 4 次播放结束。"
+    },
+    {
+      "id": "e2",
+      "act": "结局",
+      "scene": "s5",
+      "text": [
+        "门开了。",
+        "门外是同一个客厅。同样的塑料桌布。同样的风扇。同样停在七月的挂历。",
+        "沙发上有个背影，正在放一盘带子。",
+        "我喊他。",
+        "他回头。他是我。"
+      ],
+      "code": "00:00:00",
+      "effect": ["flash"],
+      "ending": "E2",
+      "end_text": "门在这里，从来不是用来出去的。"
+    },
+    {
+      "id": "e3",
+      "act": "结局",
+      "scene": "s0",
+      "text": [
+        "我把带子从机器里拔出来，装进包里。",
+        "楼道很静。我一口气跑下楼。",
+        "回家，半夜。我把它放进自己家的录像机。",
+        "画面里是阿磊家的客厅。阿磊在厨房剁肉。",
+        "他停下刀，抬头，正对镜头。"
+      ],
+      "code": "00:00:00",
+      "effect": ["flash"],
+      "set": ["has_tape"],
+      "ending": "E3",
+      "end_text": "你怎么才回来。"
+    },
+    {
+      "id": "e4",
+      "act": "结局",
+      "scene": "s4",
+      "text": [
+        "我先关掉了电视。",
+        "黑了。",
+        "黑玻璃里映出这个客厅。",
+        "客厅里有阿磊，有狗，有猫。三个都在，围着茶几，在看一盘带子。",
+        "客厅里没有我。",
+        "我抬手。玻璃里的我没有抬手。"
+      ],
+      "code": "00:00:00",
+      "effect": ["blood"],
+      "ending": "E4",
+      "end_text": "原来我一直在玻璃里面。"
     }
   ]
 }
