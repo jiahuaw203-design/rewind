@@ -1,0 +1,26 @@
+{
+  "version": "0.9",
+  "说明": "线索 id → 中文描述。笔记本只按获得顺序显示描述，不显示总数、百分比、未解锁项。",
+  "clues": {
+    "dog_tape": "阿磊家有一盘录像，内容是狗在泥地上刨土。",
+    "dog_familiar": "录像里那条狗，看着眼熟。",
+    "blank_tape_note": "夹层里的空带上写着“给你”两个字。",
+    "dog_absent": "狗窝是凉的，狗离开有一阵了。",
+    "black_hair": "狗窝棉袄上有一撮黑毛，不是黄狗的。",
+    "balcony_unlatched": "阳台门没闩。",
+    "cat_bowl_empty": "猫碗里的干粮吃了一半，潮了。",
+    "big_paw_print": "碗边有爪印，比猫爪大。",
+    "window_mud": "窗台外沿有干了的泥脚印。",
+    "window_ajar": "窗户向外敞着一道宽缝。",
+    "knife_missing": "刀架上靠里的那个槽是空的。",
+    "cutting_board_dry": "砧板是干的，但上面有一圈湿印。",
+    "red_water": "砧板下的搪瓷盆里，一层暗红色的水。",
+    "rust_smell": "那盆水有一股铁锈味。",
+    "bed_one_side": "床只有一边有躺过的痕迹。",
+    "sticky_note": "床头便利贴：“骨头汤，明天。”",
+    "single_quilt": "被子叠成方块，只有一个人的量。",
+    "timecode_anomaly": "录像时间码是 00:07:20，倒带只退 1 秒。",
+    "white_face": "画面定格在阿磊转身那一帧，脸白成一片。",
+    "scar_asked": "阿磊说，女朋友问过他手上的疤。"
+  }
+}

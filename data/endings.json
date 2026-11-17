@@ -1,48 +1,12 @@
 {
-  "version": "0.1",
+  "version": "0.9",
+  "说明": "五个结局的名字与收集页文案。判定不在这里：各节点用 route / ending 字段决定（优先级见 docs/阶段五_引擎实现与测试.md）。",
   "endings": [
-    { "id": "E0", "slot": "门口", "title": "没吃成",   "node": "e0", "hint": "门口" },
-    { "id": "E1", "slot": "客厅", "title": "看完",     "node": "e1", "hint": "客厅" },
-    { "id": "E2", "slot": "门",   "title": "剪辑",     "node": "e2", "hint": "门" },
-    { "id": "E3", "slot": "包",   "title": "带走",     "node": "e3", "hint": "包" },
-    { "id": "E4", "slot": "玻璃", "title": "玻璃",     "node": "e4", "hint": "玻璃" }
-  ],
-  "router": [
-    {
-      "id": "R4",
-      "when": "before_act4",
-      "if": ["playthrough>=1", "power_off"],
-      "ending": "E4",
-      "note": "第二周目专属：第四轮播放前关掉电视，直接进 E4，不再走终局"
-    },
-    {
-      "id": "R0",
-      "when": "ending",
-      "if": ["left_early"],
-      "ending": "E0",
-      "note": "幕一坚持离开"
-    },
-    {
-      "id": "R1",
-      "when": "ending",
-      "if": ["has_tape"],
-      "ending": "E3",
-      "note": "幕五把带子拔走"
-    },
-    {
-      "id": "R2",
-      "when": "ending",
-      "if": ["final_choice:stay"],
-      "ending": "E1",
-      "note": "终局站着不动"
-    },
-    {
-      "id": "R3",
-      "when": "ending",
-      "if": ["final_choice:run"],
-      "ending": "E2",
-      "note": "终局往门口跑"
-    }
+    { "id": "E1", "slot": "回头", "title": "已经回头了", "hint": "回头" },
+    { "id": "E2", "slot": "砧板", "title": "你找到了，但没跑掉", "hint": "砧板" },
+    { "id": "E3", "slot": "电话", "title": "三个数字", "hint": "电话" },
+    { "id": "E4", "slot": "门", "title": "你只是跑了", "hint": "门" },
+    { "id": "E5", "slot": "布条", "title": "狗叼回来的", "hint": "布条" }
   ],
   "collection_ui": {
     "counter": "已播放：{n} / 5",

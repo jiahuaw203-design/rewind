@@ -11,29 +11,62 @@ import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "data" / "script.json"
+ENDINGS = ROOT / "data" / "endings.json"
 OUT = ROOT / "docs" / "剧本_全篇.md"
 
 SCENE_NAME = {
     "s0": "楼道",
-    "s1": "客厅",
+    "s1": "阿磊的客厅",
     "s2": "带子画面",
     "s3": "厨房",
     "s4": "空客厅",
     "s5": "结局客厅",
     "s6": "白屏",
+    "s7": "旧货市场",
+    "s8": "小饭馆",
 }
+
+FX_NAME = {
+    "type": "打字",
+    "blood": "血字",
+    "shake": "抖动",
+    "eaten": "吃掉",
+    "flash": "雪花闪",
+}
+
+
+def text_of(item):
+    """text 里的一行，可能是字符串，也可能是条件文本或段内换人。"""
+    if isinstance(item, str):
+        return item
+    if item.get("speaker"):
+        cond = f"〔条件：{' 且 '.join(item['if'])}〕" if item.get("if") else ""
+        return f"**{item['speaker']}**：{item.get('say', '')}{cond}"
+    cond = f"〔条件：{' 且 '.join(item['if'])}〕" if item.get("if") else "〔条件〕"
+    return f"{item.get('say', '')}{cond}"
 
 
 def main() -> None:
     data = json.loads(SRC.read_text(encoding="utf-8"))
+    ends = json.loads(ENDINGS.read_text(encoding="utf-8"))
     nodes = data["nodes"]
 
+    total_chars = sum(len(text_of(t)) for n in nodes for t in n.get("text", []))
+
     lines = []
-    total_chars = sum(len(t) for n in nodes for t in n.get("text", []))
     lines.append(f"# {data['title']} · 全篇剧本")
     lines.append("")
     lines.append("> 本文件由 `tools/export_script_md.py` 从 `data/script.json` 生成，**不要手改**。")
-    lines.append(f"> 节点 {len(nodes)} 个 · 正文 {total_chars} 字 · 版本 {data['version']}")
+    lines.append(f"> 节点 {len(nodes)} 个 · 正文约 {total_chars} 字 · 版本 {data['version']}")
+    lines.append("> 旧六幕版本已归档在 `docs/archive/script_v1_六幕.json`，只作对照，不再改动。")
+    lines.append("")
+
+    lines.append("## 结局一览（来自 endings.json）")
+    lines.append("")
+    lines.append("| 结局 | 名字 | 收尾提示 |")
+    lines.append("|---|---|---|")
+    for e in ends.get("endings", []):
+        lines.append(f"| {e['id']} | 《{e['title']}》 | {e.get('hint', '')} |")
     lines.append("")
 
     current_act = None
@@ -44,27 +77,6 @@ def main() -> None:
             lines.append("")
             lines.append(f"## {act}")
             lines.append("")
-            if act == "幕一":
-                lines.append("> 门口 → 客厅。暖得过头的一间屋子。")
-                lines.append("")
-            elif act == "幕二":
-                lines.append("> 第一轮播放：一盘空带。")
-                lines.append("")
-            elif act == "幕三":
-                lines.append("> 第二轮播放：狗。")
-                lines.append("")
-            elif act == "幕四":
-                lines.append("> 第三轮播放：狗和猫。")
-                lines.append("")
-            elif act == "幕五":
-                lines.append("> 洗澡。回来以后，客厅空了。")
-                lines.append("")
-            elif act == "幕六":
-                lines.append("> 第四轮播放：阿磊、狗、猫。")
-                lines.append("")
-            elif act == "结局":
-                lines.append("> 五个结局。")
-                lines.append("")
 
         scene = n.get("scene", "")
         head = f"### `{n['id']}`　{SCENE_NAME.get(scene, scene)}"
@@ -74,8 +86,25 @@ def main() -> None:
             head += f"　`{n['code']}`"
         lines.append(head)
         lines.append("")
+
+        # 副作用（进入节点时发生的）
+        meta_bits = []
+        if n.get("set"):
+            meta_bits.append("set `" + "`, `".join(n["set"]) + "`")
+        if n.get("clue"):
+            meta_bits.append("线索 `" + "`, `".join(n["clue"]) + "`")
+        if n.get("tension"):
+            meta_bits.append(f"紧张度 {n['tension']:+d}")
+        if n.get("spend"):
+            meta_bits.append("计数 " + "、".join(f"{k}{v:+d}" for k, v in n["spend"].items()))
+        if n.get("route"):
+            meta_bits.append("路由 " + "；".join(f"[{' 且 '.join(r['when'])}]→`{r['next']}`" for r in n["route"]))
+        if meta_bits:
+            lines.append("**进入时**：" + "　·　".join(meta_bits))
+            lines.append("")
+
         for t in n.get("text", []):
-            lines.append(t)
+            lines.append(text_of(t))
             lines.append("")
 
         fx = n.get("effect") or []
@@ -83,7 +112,7 @@ def main() -> None:
             fx = [fx]
         fx = [f for f in fx if f != "none"]
         if fx:
-            lines.append(f"*特效：{'、'.join(fx)}*")
+            lines.append(f"*特效：{'、'.join(FX_NAME.get(f, f) for f in fx)}*")
             lines.append("")
 
         if n.get("ending"):
@@ -94,24 +123,17 @@ def main() -> None:
             continue
 
         for c in n.get("choices", []):
-            kind = c.get("kind", "story")
             mark = ""
-            if kind == "branch":
-                mark = "　〔分支〕"
-            elif kind == "action":
-                mark = "　〔行动，可被错位吃掉〕"
+            if c.get("requires"):
+                mark += f"　〔需 {' 且 '.join(c['requires'])}"
+                mark += "，灰显〕" if c.get("grey") else "〕"
             if c.get("lock"):
-                mark += f"　〔需 {c['lock']}〕"
+                mark += f"　〔跨周目 `{c['lock']}`〕"
             if c.get("label_effect"):
                 mark += f"　〔文字特效 {c['label_effect']}〕"
-            if c.get("silent"):
-                mark += "　〔点了没反应〕"
+            if c.get("time_limit"):
+                mark += f"　〔限时 {c['time_limit']}s → `{c.get('timeout')}`〕"
             lines.append(f"- → **{c['label']}**　`{c['next']}`{mark}")
-        if n.get("deviation"):
-            dv = n["deviation"]
-            lines.append(
-                f"- ⚠ 错位（{dv['mode']}）：本节点的行动选项会被改写成 `{dv['target']}`"
-            )
         lines.append("")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

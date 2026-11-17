@@ -18,8 +18,19 @@
   <header class="hud">
     <span class="hud-title" id="title">倒带</span>
     <span class="hud-scene" id="act"></span>
-    <span class="code" id="timecode">00:00:00</span>
+    <span class="code" id="timecode">—</span>
+    <button class="note-btn" id="noteBtn" title="笔记本">
+      <span class="note-glyph">▤</span>
+      <span class="note-dot"></span>
+    </button>
   </header>
+
+  <div class="note-panel" id="notePanel">
+    <p class="note-head">记下的</p>
+    <div id="noteList"></div>
+  </div>
+
+  <div class="timer-bar" id="timerBar"></div>
 
   <main class="screen">
     <div id="stage"></div>

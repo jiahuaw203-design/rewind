@@ -81,6 +81,8 @@
   <button data-scene="s4">04 空客厅</button>
   <button data-scene="s5">05 结局</button>
   <button data-scene="s6">06 白屏</button>
+  <button data-scene="s7">07 旧货市场</button>
+  <button data-scene="s8">08 小饭馆</button>
   <span class="spacer"></span>
   <span class="hint">切换 = 雪花擦除 0.55s</span>
 </div>
@@ -93,7 +95,9 @@ const SCENES = {
   s3: { no: "03", name: "厨房",   l1: "砧板是干的。刀架上少了一把刀。", l2: "冰箱在响。我听见身后有人把拖鞋踩得很慢。" },
   s4: { no: "04", name: "空客厅", l1: "客厅很安静。电视是黑的。", l2: "茶几上三罐啤酒，一罐开了，没喝。" },
   s5: { no: "05", name: "结局客厅", l1: "这盘带子没有标签。", l2: "画面里，有人推开门进来，换鞋，坐下。" },
-  s6: { no: "06", name: "白屏",   l1: "……", l2: "刀落下来之前，屏幕先白了。" }
+  s6: { no: "06", name: "白屏",   l1: "……", l2: "刀落下来之前，屏幕先白了。" },
+  s7: { no: "07", name: "旧货市场", l1: "旧货市场在巷子里，太阳照不到底。", l2: "地上全是纸箱。有人蹲着，用膝盖压住箱盖。摊主们喊的是同一种声音。" },
+  s8: { no: "08", name: "小饭馆", l1: "白炽灯，塑料桌布，桌角垫着一张折起来的烟盒。", l2: "阿磊抽了一张纸巾压在桌沿上，又抽一张，垫在我手边。" }
 };
 
 const label = document.getElementById('wipeLabel');
@@ -131,9 +135,9 @@ bar.addEventListener('click', e => {
   if (btn) setScene(btn.dataset.scene);
 });
 
-// 键盘 0-6 也能切，方便快速对比
+// 键盘 0-8 也能切，方便快速对比
 window.addEventListener('keydown', e => {
-  if (e.key >= '0' && e.key <= '6') setScene('s' + e.key);
+  if (e.key >= '0' && e.key <= '8') setScene('s' + e.key);
 });
 </script>
 </body>

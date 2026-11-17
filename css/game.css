@@ -133,7 +133,144 @@
   font-size: 17px;
 }
 
+/* ══ 线索笔记本 ══════════════════════════════════ */
+
+.note-btn {
+  position: relative;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 26px;
+  padding: 0;
+  margin-left: 4px;
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.note-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* 新线索进来时闪一下 */
+.note-btn.has-new {
+  color: var(--accent);
+  border-color: var(--accent);
+  animation: note-flash 0.6s steps(2, end) 3;
+}
+
+@keyframes note-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.note-glyph { letter-spacing: 0; }
+
+.note-dot {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  opacity: 0;
+}
+
+.note-btn.has-new .note-dot { opacity: 1; }
+
+.note-panel {
+  position: fixed;
+  top: 62px;
+  right: clamp(20px, 5vw, 64px);
+  width: min(340px, 78vw);
+  max-height: 62vh;
+  overflow-y: auto;
+  z-index: 32;
+  padding: 16px 18px 18px;
+  display: none;
+  background: color-mix(in srgb, var(--bg) 88%, #000 12%);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.note-panel.open { display: block; }
+
+.note-head {
+  margin: 0 0 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--ink-dim);
+}
+
+.note-item {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--ink);
+  padding-left: 10px;
+  border-left: 1px solid var(--line);
+}
+
+.note-empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+
+/* ══ 限时条 ══════════════════════════════════════ */
+
+.timer-bar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 35;
+  height: 2px;
+  width: 100%;
+  background: var(--ink-blood);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.timer-bar.on { opacity: 0.9; }
+
+/* ══ 灰显 / 紧张度 ══════════════════════════════ */
+
+.choice-grey {
+  color: var(--ink-dim);
+  opacity: 0.42;
+  border-left-color: var(--line);
+  cursor: not-allowed;
+}
+
+.choice-grey:hover {
+  background: transparent;
+  border-color: var(--line);
+}
+
+/* 紧张度 ≥ 6：选项轻微抖，幅度极小 */
+.choices.tense .choice {
+  animation: choice-in 0.4s ease-out both, tense-shiver 3.2s steps(2, end) infinite;
+}
+
+@keyframes tense-shiver {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(0.8px); }
+}
+
+/* 条件文本：比正文暗一档，像补记的一句话 */
+.line.cond {
+  color: var(--ink-dim);
+  font-size: 16px;
+}
+
 /* ── 减少动态效果 ── */
 @media (prefers-reduced-motion: reduce) {
   .choice { animation: none; }
+  .choices.tense .choice { animation: choice-in 0.4s ease-out both; }
+  .note-btn.has-new { animation: none; }
 }

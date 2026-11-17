@@ -115,6 +115,42 @@
 
 [data-scene="s6"] .crt::after { background: none; }
 
+/* ── s7 · 旧货市场（晒不到的巷底，纸箱灰绿） ─────── */
+[data-scene="s7"] {
+  --bg: #0d1210;
+  --ink: #c3cdc1;
+  --ink-dim: #66736a;
+  --accent: #b6e3c5;
+  --line: rgba(195, 205, 193, 0.15);
+  --halftone: rgba(8, 16, 12, 0.46);
+  --halftone-size: 5px;
+  --vignette: 0.88;
+  --tex:
+    repeating-linear-gradient(90deg, rgba(182, 227, 197, 0.05) 0 2px, transparent 2px 26px),
+    radial-gradient(ellipse at 50% 6%, rgba(200, 240, 214, 0.16), transparent 54%),
+    linear-gradient(180deg, transparent 62%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+/* 市场：扫描线更硬一点，像日光灯管有余辉 */
+[data-scene="s7"] .crt::after { opacity: 1; }
+
+/* ── s8 · 小饭馆（白炽灯、塑料桌布、油烟） ───────── */
+[data-scene="s8"] {
+  --bg: #1b1410;
+  --ink: #e9d5b6;
+  --ink-dim: #96795c;
+  --accent: #ffd39a;
+  --line: rgba(233, 213, 182, 0.18);
+  --halftone: rgba(40, 22, 10, 0.3);
+  --halftone-size: 5px;
+  --vignette: 0.66;
+  --tex:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0 6px, transparent 6px 6px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.015) 0 6px, transparent 6px 6px),
+    radial-gradient(ellipse at 50% 0%, rgba(255, 211, 154, 0.3), transparent 52%),
+    radial-gradient(ellipse at 18% 96%, rgba(255, 160, 90, 0.12), transparent 46%);
+}
+
 /* ── 纹理层：全屏固定，铺在每个场景上 ───────────── */
 .tex {
   position: fixed;
@@ -183,7 +219,8 @@ html.is-wiping .wipe-label { animation: wipe-label-run 0.55s ease-out both; }
 [data-scene="s2"],
 [data-scene="s3"],
 [data-scene="s4"],
-[data-scene="s6"] {
+[data-scene="s6"],
+[data-scene="s7"] {
   --ink-blood: #b32a20;
 }
 

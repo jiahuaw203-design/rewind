@@ -24,7 +24,7 @@
     <p class="line dim">游戏本体在 <a href="index.html" style="color:inherit">index.html</a>。</p>
 
     <div class="choices">
-      <button class="choice" id="btn-check">自检：读取三份 JSON</button>
+      <button class="choice" id="btn-check">自检：读取四份 JSON 并查跳转</button>
     </div>
 
     <pre class="log" id="log">等待自检……</pre>
@@ -40,23 +40,61 @@ const tcEl = document.getElementById('timecode');
 document.getElementById('btn-check').addEventListener('click', async () => {
   logEl.textContent = '读取中……';
   try {
-    const files = ['data/script.json', 'data/endings.json', 'data/meta.json'];
+    const files = ['data/script.json', 'data/endings.json', 'data/meta.json', 'data/clues.json'];
     const out = [];
-    let script = null;
+    const data = {};
     for (const f of files) {
       const res = await fetch(f, { cache: 'no-store' });
       if (!res.ok) throw new Error(f + ' → HTTP ' + res.status);
-      const data = await res.json();
-      if (f.endsWith('script.json')) script = data;
-      out.push('✅ ' + f + '　' + JSON.stringify(data).length + ' 字节');
+      data[f] = await res.json();
+      out.push('✅ ' + f + '　' + JSON.stringify(data[f]).length + ' 字节');
     }
-    const nodes = (script.nodes || []).length;
-    const endings = new Set((script.nodes || []).filter(n => n.ending).map(n => n.ending));
+
+    const script = data['data/script.json'];
+    const endings = data['data/endings.json'];
+    const clues = data['data/clues.json'];
+    const nodes = script.nodes || [];
+    const ids = new Set(nodes.map(n => n.id));
+    const knownScene = new Set(['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8']);
+    const clueIds = new Set(Object.keys((clues && clues.clues) || {}));
+
+    const bad = [];
+
+    if (!ids.has(script.start)) bad.push('起始节点不存在：' + script.start);
+
+    nodes.forEach(n => {
+      if (!knownScene.has(n.scene)) bad.push(n.id + '：场景 ' + n.scene + ' 不在 s0–s8');
+      (n.clue || []).forEach(c => {
+        if (!clueIds.has(c)) bad.push(n.id + '：线索 ' + c + ' 不在 clues.json');
+      });
+      (n.route || []).forEach(r => {
+        if (!ids.has(r.next)) bad.push(n.id + '：route → ' + r.next + ' 不存在');
+      });
+      (n.choices || []).forEach(c => {
+        const nx = c.next;
+        if (nx && !nx.startsWith('#') && !ids.has(nx)) bad.push(n.id + '：“' + c.label + '” → ' + nx + ' 不存在');
+        if (c.timeout && !ids.has(c.timeout)) bad.push(n.id + '：timeout → ' + c.timeout + ' 不存在');
+      });
+    });
+
+    // 反查：哪些节点没有任何入口（除 start）
+    const reached = new Set([script.start]);
+    nodes.forEach(n => {
+      (n.route || []).forEach(r => reached.add(r.next));
+      (n.choices || []).forEach(c => { if (c.next && !c.next.startsWith('#')) reached.add(c.next); });
+    });
+    const orphans = nodes.filter(n => !reached.has(n.id)).map(n => n.id);
+
+    const inScript = new Set(nodes.filter(n => n.ending).map(n => n.ending));
+    const endIds = new Set(((endings && endings.endings) || []).map(e => e.id));
+
     logEl.textContent = out.join('\n') + '\n\n' +
-      '剧本节点数：' + nodes + '\n' +
+      '剧本节点数：' + nodes.length + '\n' +
       '起始节点：' + (script.start || '—') + '\n' +
-      '剧本内结局：' + [...endings].sort().join(' / ') + '\n\n' +
-      '环境正常。';
+      '结局：引擎内 ' + [...inScript].sort().join(' / ') + '　|　endings.json ' + [...endIds].sort().join(' / ') + '\n' +
+      '线索：已在用的 ' + [...new Set(nodes.flatMap(n => n.clue || []))].length + ' 条 / 共 ' + clueIds.size + ' 条\n\n' +
+      (orphans.length ? '没有入口的节点：' + orphans.join('、') + '\n\n' : '') +
+      (bad.length ? '❌ 问题：\n' + bad.join('\n') : '✅ 跳转与线索引用全部通过。');
   } catch (err) {
     logEl.textContent =
       '❌ 读取失败\n' + err.message + '\n\n' +

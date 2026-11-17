@@ -11,32 +11,27 @@ import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "data" / "script.json"
+ENDINGS = ROOT / "data" / "endings.json"
 OUT = ROOT / "docs" / "剧本_分幕_工作稿.md"
 
 SCENE_NAME = {
     "s0": "楼道",
-    "s1": "客厅",
+    "s1": "阿磊的客厅",
     "s2": "带子画面",
     "s3": "厨房",
     "s4": "空客厅",
     "s5": "结局客厅",
     "s6": "白屏",
+    "s7": "旧货市场",
+    "s8": "小饭馆",
 }
 
 ACT_BLURB = {
-    "幕一": ("门口 → 客厅", "把“暖”和“不对劲”同时铺下去：风扇、挂历、塑料桌布、猫狗、雪花电视。阿磊说一会儿去吃饭。"),
-    "幕二": ("第一轮播放：一盘空带", "带子什么都没录，可它有时间码、有呼吸。快进闪一下背影；倒回去，雪花里有拖鞋声。"),
-    "幕三": ("第二轮播放：狗", "吃饭回来，狗没了。阿磊说“好奇怪啊”，然后想喝啤酒。带子里是狗走进厨房、门关上。"),
-    "幕四": ("第三轮播放：狗和猫", "猫也没了。带子卡在机器里。画面只是往前推，推厨房那扇门。身后一直有脚步声。"),
-    "幕五": ("洗澡 → 空客厅", "洗完出来，客厅空了。三罐啤酒，一罐开了没喝。厨房刀架上少了一把刀。"),
-    "幕六": ("第四轮播放：阿磊、狗、猫", "时间码 00:07:20。按倒带，它前进一秒。厨房里阿磊剁肉。他一回头。"),
-    "结局": ("五个结局", "E0 没吃成 / E1 看完 / E2 剪辑 / E3 带走 / E4 玻璃"),
-}
-
-KIND_MARK = {
-    "story": "推进",
-    "action": "行动（可被错位命中）",
-    "branch": "分支（决定结局，永不被错位）",
+    "第一章": ("到访 → 旧货市场 → 饭馆 → 回去", "铺两件事：这屋子暖得过头；阿磊一直在替别人做小事（垫纸巾）。市场里限翻三个摊，空带靠运气，也靠阿磊兜底。"),
+    "第二章": ("五个探索点 × 三次机会", "不显示剩余次数，用环境声提示：喊价 → 收摊 → 巷口有人说话 → 单元门 → 脚步声。播放录像额外再耗两次。"),
+    "第三章": ("录像机自己响了", "按播放 / 按倒带 / 关电视。倒带只退一秒，这一秒就是后面所有判定的钥匙。"),
+    "第四章": ("阿磊站在面前，手里没刀", "坐下 / 站着 / 先开口。灰显台词表是「你查到多少」的可视化。核心抉择五秒限时。"),
+    "结局": ("E1–E5", "先命中先返回：E5 ＞ E3 ＞ E4 ＞ E2 ＞ E1。"),
 }
 
 FX_NAME = {
@@ -48,50 +43,58 @@ FX_NAME = {
 }
 
 
+def text_of(item):
+    if isinstance(item, str):
+        return item
+    if item.get("speaker"):
+        return f"**{item['speaker']}**：{item.get('say', '')}"
+    cond = f"〔仅当 {' 且 '.join(item['if'])}〕" if item.get("if") else "〔条件〕"
+    return f"{item.get('say', '')}　{cond}"
+
+
 def choice_line(c):
-    marks = [KIND_MARK.get(c.get("kind"), "推进")]
+    marks = []
+    if c.get("requires"):
+        marks.append("需 " + " 且 ".join(c["requires"]) + ("（灰显）" if c.get("grey") else ""))
     if c.get("lock"):
-        marks.append(f"需 flag `{c['lock']}`")
+        marks.append(f"跨周目 `{c['lock']}`")
     if c.get("label_effect"):
         marks.append(f"选项文字特效 `{c['label_effect']}`")
-    if c.get("silent"):
-        marks.append("点了没反应")
-    return f"- **{c['label']}** → `{c['next']}`　（{' · '.join(marks)}）"
+    if c.get("time_limit"):
+        marks.append(f"限时 {c['time_limit']}s → `{c.get('timeout')}`")
+    tail = f"　（{' · '.join(marks)}）" if marks else ""
+    return f"- **{c['label']}** → `{c['next']}`{tail}"
 
 
 def main() -> None:
     data = json.loads(SRC.read_text(encoding="utf-8"))
+    ends = json.loads(ENDINGS.read_text(encoding="utf-8"))
     nodes = data["nodes"]
 
-    total_chars = sum(len(t) for n in nodes for t in n.get("text", []))
+    total_chars = sum(len(text_of(t)) for n in nodes for t in n.get("text", []))
     out = []
     out.append(f"# {data['title']} · 分幕剧本工作稿")
     out.append("")
-    out.append("> 给编剧用的一版：**每幕单独成章，节点带 id 与跳转**，方便直接在上面增删。")
-    out.append("> 本稿由 `tools/export_script_acts.py` 从 `data/script.json` 生成；改完正文后我会把改动回填进 JSON，再重新出一遍。")
-    out.append(f"> 现状：{len(nodes)} 个节点 · 正文 {total_chars} 字 · 按幕统计见每章开头。")
+    out.append("> 给编剧用的一版：**每章单独成章，节点带 id 与跳转**，方便直接在上面增删。")
+    out.append("> 本稿由 `tools/export_script_acts.py` 从 `data/script.json` 生成；改完正文后把改动回填进 JSON，再重新出一遍。")
+    out.append("> 旧六幕工作稿已归档在 `docs/archive/剧本_分幕_工作稿_v1_六幕.md`。")
+    out.append(f"> 现状：{len(nodes)} 个节点 · 正文约 {total_chars} 字。")
     out.append("")
 
-    # 全局速览
-    out.append("## 速览：五条路线与五个结局")
+    out.append("## 结局一览")
     out.append("")
-    endings = {
-        "E0": ("没吃成", "`a2_07` 选「还是算了」", "下一顿，我等你。"),
-        "E1": ("看完", "终局 `a6_12` 选「站着不动」", "这盘带子没有标签。"),
-        "E2": ("剪辑", "终局 `a6_12` 选「往门口跑」", "门在这里，从来不是用来出去的。"),
-        "E3": ("带走", "`a5_02b` 选「用力拔出来，装进包里」（需 `tape_stuck`）", "你怎么才回来。"),
-        "E4": ("玻璃", "终局 `a6_12` 选「先把电视关掉」（需第二周目）", "原来我一直在玻璃里面。"),
-    }
-    out.append("| 结局 | 名字 | 入口 | 收尾句 |")
+    out.append("| 结局 | 名字 | 位置 | 收尾提示 |")
     out.append("|---|---|---|---|")
-    for k, (name, how, last) in endings.items():
-        out.append(f"| {k} | {name} | {how} | {last} |")
+    for e in ends.get("endings", []):
+        out.append(f"| {e['id']} | 《{e['title']}》 | {e.get('slot', '')} | {e.get('hint', '')} |")
     out.append("")
-    out.append("三条硬规则（改剧本时不能破）：")
+    out.append("结局判定（从高到低，先命中先返回）：")
     out.append("")
-    out.append("1. 被录进带子的东西，会从房间里消失（带子收纳现实）。")
-    out.append("2. 先有带子，后有这一晚（带子永远比现实早一轮）。")
-    out.append("3. 带子只有一个空位，第四段留给镜头后面的人，也就是“我”。")
+    out.append("1. **E5**：`watched_dog_tape` 且 `checked_dog_bed` 且 `petted_dog`，且在 CH4_CALL")
+    out.append("2. **E3**：`timecode_anomaly` 且 `clues>=3` 且 `stall_unlocked`，且在 CH4_SEE")
+    out.append("3. **E4**：`checked_door`，且在 CH4_RUN")
+    out.append("4. **E2**：CH4_SEE 不满足 E3 / CH4_RUN 无 `checked_door`")
+    out.append("5. **E1**：超时且 `clues<3` / 选「回头看他」/ 无时间码却「回头」")
     out.append("")
 
     current_act = None
@@ -100,7 +103,7 @@ def main() -> None:
     def flush_act(act):
         if not act:
             return
-        chars = sum(len(t) for n in act_nodes for t in n.get("text", []))
+        chars = sum(len(text_of(t)) for n in act_nodes for t in n.get("text", []))
         scenes = []
         for n in act_nodes:
             s = n.get("scene")
@@ -109,7 +112,7 @@ def main() -> None:
         out.append("")
         out.append(f"**本章统计**：{len(act_nodes)} 个节点 · {chars} 字 · 场景 {' → '.join(SCENE_NAME.get(s, s) for s in scenes)}")
         out.append("")
-        out.append("**本幕补充位（这里留白，直接在这儿写）**")
+        out.append("**本章补充位（这里留白，直接在这儿写）**")
         out.append("")
         out.append("- 想加的环境细节：")
         out.append("- 想加的人物动作/对话：")
@@ -148,7 +151,7 @@ def main() -> None:
             out.append("")
 
         for t in n.get("text", []):
-            out.append(t)
+            out.append(text_of(t))
             out.append("")
 
         if n.get("ending"):
@@ -165,18 +168,17 @@ def main() -> None:
                 out.append(choice_line(c))
             out.append("")
 
-        if n.get("deviation"):
-            dv = n["deviation"]
-            out.append(f"> ⚠ 错位（{dv['mode']}，只此一次）：本节点里 `action` 类的选项会被引擎改写成 `{dv['target']}`。")
+        if n.get("route"):
+            out.append("> 进入即判定：" + "；".join(f"[{' 且 '.join(r['when'])}] → `{r['next']}`" for r in n["route"]))
             out.append("")
 
     flush_act(current_act)
 
     out.append("")
-    out.append("## 改剧本的三种标法（你怎么写都行，我按这个回填）")
+    out.append("## 改剧本的三种标法（怎么写都行，我按这个回填）")
     out.append("")
     out.append("1. **在原段后面加**：直接在节点下面写几行，我插进该节点的 `text`。")
-    out.append("2. **加新节点**：写个临时名字（如 `a3_08b`），标清它在谁后面、通向谁，我来接线。")
+    out.append("2. **加新节点**：写个临时名字（如 `CH2_A_DEEP_b`），标清它在谁后面、通向谁，我来接线。")
     out.append("3. **删或合并**：直接说“这几句不要了/这两段合并”，我重算字数与场景切换。")
     out.append("")
 
